@@ -16,7 +16,7 @@ let isError = false;
 let h1 = null;
 let form = null;
 
-function resetForm() {
+function resetForm()  {
   h1 = isError ? "<h1>Заполните ВСЕ поля!</h1>" : "<h1>Заполните форму!</h1>";
   form = !isSecces
     ? `${h1}

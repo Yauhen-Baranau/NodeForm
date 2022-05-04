@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>Что будем пить?</h1>
+    <div id="qqq"></div>
+    <script>
+
+      const setVote = async (code) => {
+      const data = { code: code };
+       const response = fetch("/vote", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+        
+        .then((response) => {
+            if (response.status === 200) {
+                window.location.href = '/stat';
+            }
+          })
+        };
+
+     
+
+      const getVariants = () => {
+        fetch("/variants")
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+            data.forEach((element) => {
+              var newtext = document.createTextNode(element.text);
+              var newButton = document.createElement("button");
+              newButton.appendChild(newtext);
+              newButton.setAttribute("code", element.code);
+              newButton.addEventListener("click", () => {
+                setVote(element.code);
+              });
+              document.getElementById("qqq").appendChild(newButton);
+            });
+          });
+      };
+      getVariants();
+    </script>
+  </body>
+</html>
