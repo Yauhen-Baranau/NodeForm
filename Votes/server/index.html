@@ -4,32 +4,46 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>VOTE</title>
   </head>
 
   <body>
     <h1>Что будем пить?</h1>
-    <div id="qqq"></div>
+    <div
+      id="qqq"
+      style="
+        width: 200px;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px;
+      "
+    ></div>
+    <div
+      style="
+        width: 300px;
+        height: 150px;
+        background-color: beige;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+      "
+      id="container"
+    ></div>
     <script>
-
       const setVote = async (code) => {
-      const data = { code: code };
-       const response = fetch("/vote", {
+        const data = { code: code };
+        const response = fetch("/vote", {
           method: "post",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        })
-        
-        .then((response) => {
-            if (response.status === 200) {
-                window.location.href = '/stat';
-            }
-          })
-        };
-
-     
+        }).then((response) => {
+          if (response.status === 200) {
+            getStat();
+          }
+        });
+      };
 
       const getVariants = () => {
         fetch("/variants")
@@ -37,19 +51,73 @@
             return response.json();
           })
           .then((data) => {
-            console.log(data);
-            data.forEach((element) => {
-              var newtext = document.createTextNode(element.text);
-              var newButton = document.createElement("button");
-              newButton.appendChild(newtext);
-              newButton.setAttribute("code", element.code);
-              newButton.addEventListener("click", () => {
-                setVote(element.code);
-              });
-              document.getElementById("qqq").appendChild(newButton);
-            });
+            createVariantsView(data);
           });
       };
+
+      const getStat = () => {
+        fetch("/stat")
+          .then((response) => {
+            if (response.status !== 200) {
+              console.error("/stat seponse.status = ", response.status);
+              return;
+            }
+            return response.json();
+          })
+          .then((data) => {
+            createStatusView(data);
+          });
+      };
+
+      function createStatusView(data) {
+        const container = document.getElementById("container");
+        if (container.children.length) {
+          container.innerHTML = null;
+        }
+
+        data.forEach((element) => {
+          let newDiv = document.createElement("div");
+          let newtext = document.createTextNode(
+            getNameByCode(element.code) + " " + `${element.count + 10}` + "%"
+          );
+          newDiv.appendChild(newtext);
+          newDiv.style.height = "20px";
+          newDiv.style.backgroundColor = "red";
+          newDiv.style.width = `${element.count + 10}` + "%";
+          container.appendChild(newDiv);
+        });
+      }
+
+      function createVariantsView(data) {
+        data.forEach((element) => {
+          var newtext = document.createTextNode(element.text);
+          var newButton = document.createElement("button");
+          newButton.appendChild(newtext);
+          newButton.setAttribute("code", element.code);
+          newButton.addEventListener("click", () => {
+            setVote(element.code);
+          });
+          document.getElementById("qqq").appendChild(newButton);
+        });
+      }
+
+      function getNameByCode(code) {
+        switch (code) {
+          case 1:
+            return "Пиво";
+            break;
+          case 2:
+            return "Сок";
+            break;
+          case 3:
+            return "Вода";
+            break;
+
+          default:
+            return "Что-то сломалось";
+        }
+      }
+
       getVariants();
     </script>
   </body>
