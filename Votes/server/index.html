@@ -29,7 +29,26 @@
       "
       id="container"
     ></div>
+
+    <textarea style="width: 300px; height: 150px" id="textarea"></textarea
+    ><br />
+    <button onclick="getMIMEtypeFile('text/html')">HTML</button>
+    <button onclick="getMIMEtypeFile('application/json')">JSON</button>
+    <button onclick="getMIMEtypeFile('application/xml')">XML</button>
+
     <script>
+      const getMIMEtypeFile = async (mimeStr) => {
+        const fetchOptions = {
+          headers: {
+            Accept: mimeStr,
+          },
+        };
+        let response = await fetch("/stat", fetchOptions);
+        let txt = await response.text();
+  
+        createTextAreaView(txt);
+      };
+
       const setVote = async (code) => {
         const data = { code: code };
         const response = fetch("/vote", {
@@ -56,7 +75,12 @@
       };
 
       const getStat = () => {
-        fetch("/stat")
+        const fetchOptions = {
+          headers: {
+            Accept: "application/json",
+          },
+        };
+        fetch("/stat", fetchOptions)
           .then((response) => {
             if (response.status !== 200) {
               console.error("/stat seponse.status = ", response.status);
@@ -99,6 +123,15 @@
           });
           document.getElementById("qqq").appendChild(newButton);
         });
+      }
+
+      function createTextAreaView(data) {
+        let textArea = document.getElementById("textarea");
+        textArea.innerHTML = "";
+        var newtext = document.createTextNode(data);
+        var newtext = document.createTextNode(data);
+        textArea.appendChild(newtext);
+        console.log("text", data);
       }
 
       function getNameByCode(code) {
